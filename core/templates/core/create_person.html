@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <form action="" method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <input type="submit" value="Create Person">
+    </form>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script type="text/javascript">
+$(document).ready(function() {
+    $("#id_town").html("") // set the options empty for the town field
+    $("#id_state").change(function() {
+        const state_id = $(this).val();	 // get the id of the selected state
+        $.ajax({
+            url: 'load-towns',	// url path to load the towns
+            type: 'POST',	// type of request
+            datatype: 'json',
+            data: {'csrfmiddlewaretoken': getCookie('csrftoken'), 'sid': state_id},	// data
+            success: function (resp) {
+                const data = resp.data;
+                options = ''
+                for (let i=0; i < data.length; i++) {
+                    let pk = data[i].pk
+                    let name = data[i].name
+                    options += "<option value=" + pk + ">" + name + "</option>"
+                };
+                $("#id_town").html(options);
+            },
+            error: function (xhr) {
+                console.log(xhr);
+            }
+        })
+
+    })
+})
+/* function to get csrfmiddlewaretoken, since we are using a POST method, django requires it*/
+function getCookie(name) { 
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+</script>
+
+</body>
+</html>
